@@ -1,0 +1,62 @@
+# Render Multi-Service Infrastructure Blueprint
+# Autonomous Customer Support & Resolution Platform
+
+services:
+  # 1. FastAPI + LangGraph Agent Core Web Service
+  - type: web
+    name: support-agent-backend
+    env: python
+    region: singapore # Closest to Neon ap-southeast-1
+    plan: starter
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: ENVIRONMENT
+        value: "production"
+      - key: EURI_API_KEY
+        sync: false
+      - key: EURI_BASE_URL
+        value: "https://api.euron.one/api/v1/euri"
+      - key: DEFAULT_MODEL
+        value: "gpt-6-luna"
+      - key: EMBEDDING_MODEL
+        value: "text-embedding-3-small"
+      - key: DATABASE_URL
+        sync: false
+      - key: ASYNC_DATABASE_URL
+        sync: false
+      - key: PINECONE_API_KEY
+        sync: false
+      - key: PINECONE_INDEX_NAME
+        value: "support-knowledge-base"
+      - key: PINECONE_HOST
+        sync: false
+      - key: APP_SECRET
+        generateValue: true
+
+  # 2. Next.js 16 Support Portal & Dashboard
+  - type: web
+    name: support-agent-frontend
+    env: node
+    region: singapore
+    plan: starter
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm start"
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20.9.0"
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: support-agent-backend
+          property: url
+          format: "{url}/api/v1"
+      - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
