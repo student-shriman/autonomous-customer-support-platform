@@ -199,10 +199,6 @@ autonomous_customer_support_platform/
 │   ├── lld.md                     # Low-Level Design Document
 │   └── wireframes.md              # UI/UX & Wireframe Specifications
 │
-├── test.py                        # Euri LLM API verification
-├── test_db.py                     # Neon PostgreSQL verification (psycopg 3)
-├── test_pinecone.py               # Pinecone Vector Store verification
-├── test_backend.py                # Full-stack backend & LangGraph E2E test
 ├── render.yaml                    # Render Blueprint deployment configuration
 ├── docker-compose.yml             # Single-command local full-stack runner
 └── requirements.txt               # Backend dependencies
@@ -262,24 +258,15 @@ npm run dev -- -p 3000
 
 ---
 
-## 🧪 Comprehensive Verification Suite
+## 🧪 System Verification
 
-Run all verification scripts to test every subsystem independently:
+Verify system readiness across services:
 
 ```bash
-# 1. Test Euri LLM (Chat, Pydantic Structured Output, Token Streaming)
-python3 test.py
+# 1. Verify FastAPI Backend Health Probe
+curl -s http://localhost:8000/health
 
-# 2. Test Neon PostgreSQL (psycopg 3 Sync/Async, asyncpg, SQLAlchemy)
-python3 test_db.py
-
-# 3. Test Pinecone Vector Store (Embedding generation, upsert, semantic search)
-python3 test_pinecone.py
-
-# 4. Test Full Backend & Multi-Agent Flow (FastAPI lifespan, tickets, HITL, LangGraph)
-python3 test_backend.py
-
-# 5. Verify Next.js Production Build
+# 2. Verify Next.js Production Build
 cd frontend && npm run build
 ```
 
