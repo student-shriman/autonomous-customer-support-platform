@@ -115,25 +115,25 @@ sequenceDiagram
     actor Specialist as Human Support Specialist
     participant MCP as MCP Operational Tools
 
-    Customer->>Agent: "Refund $89 for duplicate renewal on invoice #INV-9821"
-    Agent->>Agent: Supervisor routes to Troubleshooting & Knowledge
+    Customer->>Agent: Request refund for duplicate invoice charge
+    Agent->>Agent: Supervisor routes to Troubleshooting and Knowledge
     Agent->>Agent: Troubleshooting confirms duplicate charge
     Agent->>Agent: Resolution Agent drafts refund action
-    Agent->>Agent: Risk check: Financial mutation > $50.00 -> HIGH RISK
-    Agent->>DB: Pauses execution; registers pending action in hitl_actions
-    Agent-->>Customer: "Drafted refund; specialist team is providing quick sign-off."
-    DB-->>Specialist: Event appears on HITL Action Center Dashboard
+    Agent->>Agent: Risk check: Financial action exceeds 50 dollar limit
+    Agent->>DB: Save checkpoint and register action in hitl_actions
+    Agent-->>Customer: Refund drafted, awaiting specialist sign-off
+    DB-->>Specialist: Action displayed in HITL Review Center
     alt Approve Action
-        Specialist->>Agent: Decision: APPROVED
-        Agent->>MCP: issue_refund(invoice_id='INV-9821', amount=89.00)
-        MCP-->>Agent: Refund confirmation #rf_sec_9821
-        Agent-->>Customer: "Refund of $89.00 processed successfully."
+        Specialist->>Agent: Submit Decision: APPROVED
+        Agent->>MCP: Execute issue_refund tool
+        MCP-->>Agent: Refund confirmation returned
+        Agent-->>Customer: Refund of 89 dollars processed successfully
     else Modify Action
-        Specialist->>Agent: Decision: MODIFIED (Adjust amount to $44.50)
-        Agent->>MCP: issue_refund(amount=44.50)
+        Specialist->>Agent: Submit Decision: MODIFIED (Adjust amount)
+        Agent->>MCP: Execute issue_refund with updated amount
     else Reject Action
-        Specialist->>Agent: Decision: REJECTED (Reason: Policy exclusion)
-        Agent-->>Customer: "Request reviewed; refund cannot be authorized..."
+        Specialist->>Agent: Submit Decision: REJECTED
+        Agent-->>Customer: Request reviewed, refund declined per policy
     end
 ```
 
